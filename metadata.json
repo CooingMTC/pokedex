@@ -1,0 +1,6 @@
+{
+  "name": "Poke22",
+  "description": "An elegant, highly-polished Pokemon explorer and statistics tracker with advanced filters, type analysis, and detailed stat cards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
