@@ -11,23 +11,41 @@ export function usePokemonLogic() {
   const [loading, setLoading] = useState<boolean>(true);
   const [isShinyMaster, setIsShinyMaster] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"pokedex" | "profile" | "pokebag" | "battle" | "expo">("pokedex");
+  const [activeTab, setActiveTab] = useState<
+    "pokedex" | "profile" | "pokebag" | "battle" | "expo"
+  >("pokedex");
 
   const [trainer, setTrainer] = useState({
-    userId: "", nome: "", titulo: "", nivel: 1, xp: 0, insignias: 0, vitorias: 0, derrotas: 0, avatar: "",
+    userId: "",
+    nome: "",
+    titulo: "",
+    nivel: 1,
+    xp: 0,
+    insignias: 0,
+    vitorias: 0,
+    derrotas: 0,
+    avatar: "",
   });
 
   const [pokebag, setPokebag] = useState<Pokemon[]>([]);
   const [battleTeam, setBattleTeam] = useState<Pokemon[]>([]);
 
-  const BASE_URL = "https://lnh1dhp1mj.execute-api.us-east-1.amazonaws.com/api-pokemon";
+  const BASE_URL =
+    "https://lnh1dhp1mj.execute-api.us-east-1.amazonaws.com/api-pokemon";
 
   const mapPkmn = (list: any[]): Pokemon[] =>
     list.map((p) => ({
-      id: Number(p.index), index: p.index, nome: p.name, imagem: p.image, imagemShiny: p.image,
+      id: Number(p.index),
+      index: p.index,
+      nome: p.name,
+      imagem: p.image,
+      imagemShiny: p.image,
       tipos: p.types || ["normal"],
-      poderes: p.abilities ? p.abilities.map((a: any) => ({ nome: a.name, forca: a.strength })) : [],
-      altura: p.altura ?? 0, peso: p.peso ?? 0,
+      poderes: p.abilities
+        ? p.abilities.map((a: any) => ({ nome: a.name, forca: a.strength }))
+        : [],
+      altura: p.altura ?? 0,
+      peso: p.peso ?? 0,
     }));
 
   const loadTrainerTeam = useCallback(async (uid?: string) => {
@@ -35,7 +53,9 @@ export function usePokemonLogic() {
       const userId = uid || (await AsyncStorage.getItem("userId"));
       if (!userId) return;
 
-      const response = await fetch(`${BASE_URL}/pokemon/v1/team?user-id=${userId}`);
+      const response = await fetch(
+        `${BASE_URL}/pokemon/v1/team?user-id=${userId}`,
+      );
       const data = await response.json();
 
       const teamFromServer = mapPkmn(data.team || []);
@@ -68,7 +88,7 @@ export function usePokemonLogic() {
         removedPokemon: removedId,
         newPokemon: newId,
         "removed-pokemon": removedId,
-        "new-pokemon": newId
+        "new-pokemon": newId,
       }), // Mandamos no Body também com todos os padrões de nomenclatura possíveis
     });
 
@@ -83,86 +103,128 @@ export function usePokemonLogic() {
   // --- ESTRATÉGIA DEFINITIVA DE REORDENAÇÃO ---
   const setTeamOrderOnServer = async (newTeamIds: number[]) => {
     const userId = await AsyncStorage.getItem("userId");
-    if (!userId) return;
+    if (!userId || newTeamIds.length !== 5) return; // Garante que só envia se tiver 5
 
-    const idsString = newTeamIds.join(',');
-    // Colocamos o array como string na URL
+    const idsString = newTeamIds.join(",");
     const url = `${BASE_URL}/pokemon/v1/team?user-id=${userId}&teamOrder=${idsString}`;
 
     const response = await fetch(url, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        teamOrder: newTeamIds // Mandamos como Array no JSON Body
+        teamOrder: newTeamIds,
+        "user-id": userId,
       }),
     });
 
-    const text = await response.text();
     if (!response.ok) {
-      console.log("Erro ORDER do Backend:", text);
-      throw new Error(text);
+      const errorText = await response.text();
+      throw new Error(errorText || "Falha na resposta do servidor");
     }
-    return text ? JSON.parse(text) : {};
+    return response.ok;
   };
 
-const handleAddToTeam = async (pkmn: Pokemon) => {
-  if (battleTeam.some((p) => p.id === pkmn.id)) return;
+  const handleAddToTeam = async (pkmn: Pokemon) => {
+    if (battleTeam.some((p) => p.id === pkmn.id)) return;
 
-  if (battleTeam.length !== 5) {
-    Alert.alert(
-      "Time inválido",
-      "O servidor exige exatamente 5 Pokémon no time."
-    );
-    return;
-  }
+    if (battleTeam.length !== 5) {
+      Alert.alert(
+        "Time inválido",
+        "O servidor exige exatamente 5 Pokémon no time.",
+      );
+      return;
+    }
 
-  try {
-    const ultimoPokemon = battleTeam[4];
+    try {
+      const ultimoPokemon = battleTeam[4];
 
-    await updateTeamOnServer(
-      ultimoPokemon.id,
-      pkmn.id
-    );
+      await updateTeamOnServer(ultimoPokemon.id, pkmn.id);
 
-    await loadTrainerTeam();
+      await loadTrainerTeam();
 
-    Alert.alert(
-      "Sucesso!",
-      `${pkmn.nome} substituiu ${ultimoPokemon.nome}.`
-    );
-  } catch (error) {
-    Alert.alert(
-      "Erro",
-      "Não foi possível realizar a troca."
-    );
-  }
-};
+      Alert.alert("Sucesso!", `${pkmn.nome} substituiu ${ultimoPokemon.nome}.`);
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível realizar a troca.");
+    }
+  };
 
   const handleRemoveFromTeam = async (id: number) => {
     try {
       // Pega o primeiro Pokémon que está na Bag, mas não está no Time
-      const substitutoDisponivel = pokebag.find((p) => !battleTeam.some((teamPoke) => teamPoke.id === p.id));
+      const substitutoDisponivel = pokebag.find(
+        (p) => !battleTeam.some((teamPoke) => teamPoke.id === p.id),
+      );
 
       if (!substitutoDisponivel) {
-        Alert.alert("Sem substitutos", "Você precisa de um Pokémon livre na sua Bag para assumir esta vaga no time.");
+        Alert.alert(
+          "Sem substitutos",
+          "Você precisa de um Pokémon livre na sua Bag para assumir esta vaga no time.",
+        );
         return;
       }
 
       await updateTeamOnServer(id, substitutoDisponivel.id);
       await loadTrainerTeam();
     } catch (error) {
-      Alert.alert("Falha na Remoção", "Não foi possível realizar a substituição.");
+      Alert.alert(
+        "Falha na Remoção",
+        "Não foi possível realizar a substituição.",
+      );
     }
   };
 
   const handleClearTeam = async () => {
-    Alert.alert(
-      "Ação Bloqueada", 
-      "A API do servidor não permite remover Pokémons e deixar espaços vazios. Você deve manter exatamente 5 membros."
-    );
+    if (pokebag.length === 0) {
+      Alert.alert("Erro", "Mochila vazia.");
+      return;
+    }
+
+    // 1. Sorteamos os 5 IDs que vão entrar no time ANTES de começar as trocas
+    let novosIds: number[] = [];
+    if (pokebag.length >= 5) {
+      // Sorteia 5 sem repetir
+      const embaralhado = [...pokebag].sort(() => Math.random() - 0.5);
+      novosIds = embaralhado.slice(0, 5).map((p) => p.id);
+    } else {
+      // Menos de 5: sorteia 5 vezes podendo repetir
+      for (let i = 0; i < 5; i++) {
+        const rIdx = Math.floor(Math.random() * pokebag.length);
+        novosIds.push(pokebag[rIdx].id);
+      }
+    }
+
+    try {
+      // 2. Opcional: Mostrar um alerta de carregamento ou algo do tipo
+      // Pois faremos 5 requisições seguidas
+
+      // 3. Loop de trocas: Para cada pokemon do time atual, trocamos pelo sorteado
+      for (let i = 0; i < battleTeam.length; i++) {
+        const pokemonAntigoId = battleTeam[i].id;
+        const pokemonNovoId = novosIds[i];
+
+        // Só faz a chamada se o pokemon for realmente diferente
+        if (pokemonAntigoId !== pokemonNovoId) {
+          await updateTeamOnServer(pokemonAntigoId, pokemonNovoId);
+        }
+      }
+
+      // 4. Após terminar todas as trocas, recarregamos o time do servidor uma única vez
+      await loadTrainerTeam();
+      Alert.alert("Sucesso", "O time foi totalmente renovado!");
+    } catch (error) {
+      console.error("Erro na renovação total:", error);
+      Alert.alert(
+        "Erro",
+        "Houve um problema ao trocar alguns membros do time.",
+      );
+      await loadTrainerTeam(); // Recarrega para ver onde parou
+    }
   };
 
-  const handleShiftTeamOrder = async (index: number, direction: "up" | "down") => {
+  const handleShiftTeamOrder = async (
+    index: number,
+    direction: "up" | "down",
+  ) => {
     const targetIdx = direction === "up" ? index - 1 : index + 1;
     if (targetIdx < 0 || targetIdx >= battleTeam.length) return;
 
@@ -175,7 +237,7 @@ const handleAddToTeam = async (pkmn: Pokemon) => {
 
     try {
       // Manda a nova lista de 5 IDs para a API salvar
-      const newTeamIds = newTeam.map(p => p.id);
+      const newTeamIds = newTeam.map((p) => p.id);
       await setTeamOrderOnServer(newTeamIds);
     } catch (error) {
       console.log("Falha ao salvar a nova ordem no servidor");
@@ -186,12 +248,12 @@ const handleAddToTeam = async (pkmn: Pokemon) => {
   const handleReleasePokemon = async (id: number) => {
     try {
       const userId = await AsyncStorage.getItem("userId");
-      
+
       // Se ele estiver no time, forçamos a troca antes de apagar
       if (battleTeam.some((p) => p.id === id)) {
         await handleRemoveFromTeam(id);
       }
-      
+
       const url = `${BASE_URL}/pokemon/v1/captured?user-id=${userId}&pokemon-id=${id}`;
       await fetch(url, { method: "DELETE" });
       await loadTrainerTeam();
@@ -220,7 +282,9 @@ const handleAddToTeam = async (pkmn: Pokemon) => {
         const userId = await AsyncStorage.getItem("userId");
         if (savedLogin === "true" && userId) {
           setIsLoggedIn(true);
-          const savedTrainer = await AsyncStorage.getItem("pkmn_trainer_profile");
+          const savedTrainer = await AsyncStorage.getItem(
+            "pkmn_trainer_profile",
+          );
           if (savedTrainer) setTrainer(JSON.parse(savedTrainer));
           await loadTrainerTeam(userId);
         }
@@ -255,7 +319,11 @@ const handleAddToTeam = async (pkmn: Pokemon) => {
   };
 
   const handleLogout = async () => {
-    await AsyncStorage.multiRemove(["pkmn_is_logged_in", "userId", "pkmn_trainer_profile"]);
+    await AsyncStorage.multiRemove([
+      "pkmn_is_logged_in",
+      "userId",
+      "pkmn_trainer_profile",
+    ]);
     setIsLoggedIn(false);
     setBattleTeam([]);
     setPokebag([]);
@@ -263,10 +331,28 @@ const handleAddToTeam = async (pkmn: Pokemon) => {
   };
 
   return {
-    isLoggedIn, authLoading, pokemonList, loading, isShinyMaster, errorMsg,
-    activeTab, trainer, pokebag, battleTeam, setActiveTab, setIsShinyMaster,
-    handleAuthSuccess, handleLogout, handleCatchPokemon, handleReleasePokemon,
-    handleAddToTeam, handleRemoveFromTeam, handleClearTeam, handleShiftTeamOrder,
-    setTrainer, setBattleTeam, loadTrainerTeam,
+    isLoggedIn,
+    authLoading,
+    pokemonList,
+    loading,
+    isShinyMaster,
+    errorMsg,
+    activeTab,
+    trainer,
+    pokebag,
+    battleTeam,
+    setActiveTab,
+    setIsShinyMaster,
+    handleAuthSuccess,
+    handleLogout,
+    handleCatchPokemon,
+    handleReleasePokemon,
+    handleAddToTeam,
+    handleRemoveFromTeam,
+    handleClearTeam,
+    handleShiftTeamOrder,
+    setTrainer,
+    setBattleTeam,
+    loadTrainerTeam,
   };
 }
