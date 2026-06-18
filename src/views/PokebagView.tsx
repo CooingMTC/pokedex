@@ -1,12 +1,12 @@
-import { 
-  ArrowDown, 
-  ArrowUp, 
-  Plus, 
-  Search, 
-  Trash2, 
-  Trophy, 
-  User, 
-  Ghost, 
+import {
+  ArrowDown,
+  ArrowUp,
+  Plus,
+  Search,
+  Trash2,
+  Trophy,
+  User,
+  Ghost,
   X,
   Zap
 } from "lucide-react-native";
@@ -47,7 +47,6 @@ export function PokebagView({
 }: PokebagViewProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // Filtro otimizado
   const filteredBag = useMemo(() => {
     return pokebag.filter((p) =>
       p.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -56,13 +55,11 @@ export function PokebagView({
   }, [pokebag, searchQuery]);
 
   return (
-    <ScrollView 
-      className="flex-1 bg-[#070707]" 
+    <ScrollView
+      className="flex-1 bg-[#070707]"
       contentContainerStyle={{ paddingBottom: 80, paddingHorizontal: 24, paddingTop: 32 }}
       showsVerticalScrollIndicator={false}
     >
-      
-      {/* BANNER PRINCIPAL */}
       <View className="relative rounded-[32px] bg-white/[0.02] border border-white/10 p-8 overflow-hidden mb-10">
         <Text
           className="absolute top-[-20] right-[-20] font-black uppercase text-white italic"
@@ -91,13 +88,13 @@ export function PokebagView({
         </View>
       </View>
 
-      {/* SEÇÃO 1: TIME DE BATALHA */}
       <View className="mb-12">
         <View className="flex-row items-center justify-between border-b border-white/10 pb-4 mb-6">
           <View className="flex-row items-center gap-2">
             <Zap size={16} color="#10b981" />
+            {/* AGORA REFLETE O LIMITE REAL DA API (5 POKÉMONS) */}
             <Text className="text-sm font-black uppercase text-white tracking-[2px]">
-              TIME ATIVO <Text className="text-emerald-500">({battleTeam.length}/6)</Text>
+              TIME ATIVO <Text className="text-emerald-500">({battleTeam.length}/5)</Text>
             </Text>
           </View>
 
@@ -174,22 +171,20 @@ export function PokebagView({
             })
           )}
 
-          {Array.from({ length: Math.max(0, 6 - battleTeam.length) }).map((_, i) => (
+          {Array.from({ length: Math.max(0, 5 - battleTeam.length) }).map((_, i) => (
             <View key={`empty-${i}`} className="h-16 border border-dashed border-white/5 rounded-2xl items-center justify-center opacity-20">
-               <Plus size={16} color="#52525b" />
+              <Plus size={16} color="#52525b" />
             </View>
           ))}
         </View>
       </View>
 
-      {/* SEÇÃO 2: POKEBAG */}
       <View>
         <View className="mb-6">
           <Text className="text-sm font-black uppercase text-white tracking-[2px] mb-4">
-            MEU ACERVO <Text className="text-zinc-500">({pokebag.length})</Text>
+            MEU ACERVO <Text className="text-zinc-500">({pokebag.length}/151)</Text>
           </Text>
 
-          {/* BARRA DE BUSCA AJUSTADA */}
           <View className="relative">
             <View className="absolute left-4 top-[15px] z-10">
               <Search size={16} color={searchQuery ? "#10b981" : "#52525b"} />
@@ -203,8 +198,8 @@ export function PokebagView({
               autoCapitalize="none"
             />
             {searchQuery.length > 0 && (
-              <Pressable 
-                onPress={() => setSearchQuery("")} 
+              <Pressable
+                onPress={() => setSearchQuery("")}
                 className="absolute right-4 top-[15px]"
               >
                 <X size={16} color="#f87171" />
@@ -238,7 +233,7 @@ export function PokebagView({
                   style={{ width: '48%' }}
                 >
                   <View className="relative w-20 h-20 items-center justify-center mb-3">
-                    <View 
+                    <View
                       className="absolute w-14 h-14 rounded-full opacity-10"
                       style={{ backgroundColor: hexColor }}
                     />
@@ -262,10 +257,11 @@ export function PokebagView({
                     ) : (
                       <Pressable
                         onPress={() => onAddToTeam(poke)}
-                        disabled={battleTeam.length >= 6}
-                        className={`w-full py-2.5 rounded-xl bg-white/5 border border-white/10 items-center active:bg-white/10 ${battleTeam.length >= 6 ? 'opacity-20' : ''}`}
+                        className={`w-full py-2.5 rounded-xl bg-white/5 border border-white/10 items-center active:bg-white/10 ${battleTeam.length >= 5 ? 'opacity-20' : ''}`}
                       >
-                        <Text className="text-[9px] font-black text-white uppercase tracking-tighter">Recrutar</Text>
+                        <Text className="text-[9px] font-black text-white uppercase tracking-tighter">
+                          {battleTeam.length >= 5 ? "Substituir Último" : "Recrutar"}
+                        </Text>
                       </Pressable>
                     )}
 

@@ -1,6 +1,6 @@
 import { View, Text, Pressable, StatusBar } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { Sparkles, User, Trophy, Smartphone } from "lucide-react-native";
+import { Sparkles, User, Trophy, Smartphone, Swords } from "lucide-react-native";
 import { usePokemonLogic } from "@/hooks/pokemonLogic";
 import "../../global.css";
 import { TrainerAuthScreen } from "@/views/TrainerAuthScreen";
@@ -8,6 +8,9 @@ import { PokedexView } from "@/views/PokedexView";
 import { ProfileView } from "@/views/ProfileView";
 import { PokebagView } from "@/views/PokebagView";
 import { ExpoDevView } from "@/views/ExpoDevView";
+import { BattleView } from "@/views/BattleView";
+import { } from "lucide-react-native";
+
 
 export default function App() {
   const logic = usePokemonLogic();
@@ -26,7 +29,7 @@ export default function App() {
     return (
       <TrainerAuthScreen
         onAuthSuccess={logic.handleAuthSuccess}
-        onRegisterSuccess={() => {}}
+        onRegisterSuccess={() => { }}
       />
     );
   }
@@ -84,7 +87,7 @@ export default function App() {
               trainer={logic.trainer}
               onTrainerChange={logic.setTrainer}
               pokebagCount={logic.pokebag.length}
-              onResetTrainer={() => {}}
+              onResetTrainer={() => { }}
             />
           )}
           {logic.activeTab === "pokebag" && (
@@ -99,6 +102,17 @@ export default function App() {
               onReleasePokemon={logic.handleReleasePokemon}
             />
           )}
+
+          {logic.activeTab === "battle" && (
+            <BattleView
+              battleTeam={logic.battleTeam}
+              pokemonList={logic.pokemonList}
+              isShinyMaster={logic.isShinyMaster}
+              onCatch={logic.handleCatchPokemon}
+            />
+          )}
+
+
           {logic.activeTab === "expo" && <ExpoDevView />}
         </View>
 
@@ -124,6 +138,12 @@ export default function App() {
               />
             }
             onPress={() => logic.setActiveTab("profile")}
+          />
+          <TabButton
+            active={logic.activeTab === "battle"}
+            label="COMBATE"
+            icon={<Swords size={18} color={logic.activeTab === "battle" ? "#FF421C" : "#52525b"} />}
+            onPress={() => logic.setActiveTab("battle")}
           />
           <TabButton
             active={logic.activeTab === "pokebag"}
