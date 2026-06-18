@@ -18,10 +18,7 @@ import {
   X,
 } from "lucide-react-native";
 
-// 1. Mapeamento correto de imagens locais usando require
 const AVATAR_MAP: { [key: string]: any } = {
-  // Ajuste o caminho relativo conforme a estrutura de pastas do seu projeto
-  // Exemplo: se o componente está em /src/components e a imagem em /assets
   goti22: require("@/assets/goti22.png"),
 };
 
@@ -53,17 +50,13 @@ export function ProfileView({
   const [tempTitle, setTempTitle] = useState<string>(trainer.titulo);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
-  // 2. Função de resolução de fonte corrigida
   const resolveAvatarSource = (avatar: string) => {
-    // Se o valor do avatar for a chave "goti22", retorna o require do mapa
     if (avatar === "goti22") {
       return AVATAR_MAP.goti22;
     }
-    // Se for um link HTTP ou base64, utiliza o objeto uri
     if (avatar && (avatar.startsWith('http') || avatar.startsWith('data:'))) {
       return { uri: avatar };
     }
-    // Fallback para uma imagem padrão caso o avatar esteja vazio
     return { uri: `https://api.dicebear.com/7.x/avataaars/svg?seed=${trainer.nome}` };
   };
 
@@ -118,7 +111,6 @@ export function ProfileView({
   return (
     <ScrollView className="flex-1 bg-[#070707]" contentContainerStyle={{ paddingBottom: 60, paddingHorizontal: 24, paddingTop: 32 }}>
 
-      {/* HEADER HERO */}
       <View className="relative rounded-[32px] bg-white/[0.02] border border-white/10 p-8 overflow-hidden mb-8">
         <Text
           className="absolute right-[-20] top-[-10] font-black text-white italic"
@@ -140,7 +132,6 @@ export function ProfileView({
         </View>
       </View>
 
-      {/* CARD DE PERFIL / AVATAR */}
       <View className="bg-white/[0.02] border border-white/10 rounded-[40px] p-8 items-center relative mb-8">
         <Pressable
           onPress={() => {
@@ -214,7 +205,6 @@ export function ProfileView({
         )}
       </View>
 
-      {/* STATS GRID */}
       <View className="bg-white/[0.02] border border-white/10 rounded-[40px] p-8 gap-6">
         <View className="flex-row items-center gap-3 border-b border-white/5 pb-5">
           <Database size={16} color="#10b981" />
@@ -222,7 +212,6 @@ export function ProfileView({
         </View>
 
         <View className="gap-4">
-          {/* Capturados */}
           <View className="bg-black/40 border border-white/5 p-5 rounded-[24px] flex-row items-center justify-between">
             <View>
               <Text className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Capturas</Text>
@@ -233,7 +222,6 @@ export function ProfileView({
             </View>
           </View>
 
-          {/* Insígnias */}
           <View className="bg-black/40 border border-white/5 p-5 rounded-[24px] flex-row items-center justify-between">
             <View>
               <Text className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Insígnias</Text>
@@ -251,7 +239,6 @@ export function ProfileView({
             </Pressable>
           </View>
 
-          {/* Vitórias */}
           <View className="bg-black/40 border border-white/5 p-5 rounded-[24px] flex-row items-center justify-between">
             <View>
               <Text className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Batalhas Ganhas</Text>

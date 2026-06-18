@@ -81,18 +81,15 @@ export function PokemonModal({
     <Modal visible={!!pokemon} transparent animationType="none" onRequestClose={onClose}>
       <View style={styles.modalContainer}>
         
-        {/* FUNDO DE SOBREPOSIÇÃO (BACKDROP) */}
         <Animated.View 
           style={[styles.backdrop, { opacity: fadeAnim }]}
         >
           <Pressable style={StyleSheet.absoluteFill} onPress={onClose}>
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
-            {/* Overlay preto extra caso o Blur falhe ou seja fraco */}
             <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.85)' }]} />
           </Pressable>
         </Animated.View>
 
-        {/* CONTEÚDO DO MODAL */}
         <Animated.View
           style={[
             styles.modalContent,
@@ -102,7 +99,6 @@ export function PokemonModal({
             }
           ]}
         >
-          {/* HEADER COM GRADIENTE */}
           <View style={styles.header}>
             <LinearGradient
               colors={[`${hexColor}90`, `${hexColor}20`, "transparent"]}
@@ -125,7 +121,6 @@ export function PokemonModal({
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-            {/* NOME E TIPOS */}
             <View className="items-center">
               <Text className="text-4xl font-black text-white uppercase italic tracking-tighter text-center">
                 {pokemon.nome}
@@ -146,7 +141,6 @@ export function PokemonModal({
               </View>
             </View>
 
-            {/* INFO (PESO/ALTURA) */}
             <View className="flex-row justify-around py-6 mt-6 border-y border-white/5">
               <View className="items-center">
                 <View className="flex-row items-center gap-2 mb-1">
@@ -164,7 +158,6 @@ export function PokemonModal({
               </View>
             </View>
 
-            {/* STATS */}
             <View className="mt-8">
               <Text className="text-zinc-400 text-[10px] font-black uppercase tracking-[4px] mb-6">Base Stats</Text>
               
@@ -194,7 +187,6 @@ export function PokemonModal({
               </View>
             </View>
 
-            {/* AÇÕES */}
             <View className="flex-row gap-3 mt-12 mb-6">
               <Pressable 
                 onPress={onToggleShiny}

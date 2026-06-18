@@ -43,7 +43,6 @@ export function PokedexView({
 }: PokedexViewProps) {
   const { width } = useWindowDimensions();
 
-  // Define colunas (2 para mobile, 3 para tablet, 4 para telas grandes)
   const numColumns = useMemo(() => {
     if (width >= 1024) return 4;
     if (width >= 768) return 3;
@@ -96,19 +95,16 @@ export function PokedexView({
         keyExtractor={(item) => item.id.toString()}
         numColumns={numColumns}
         
-        // Ajuste de layout: padding horizontal global aqui para alinhar tudo
         contentContainerStyle={{ 
           paddingHorizontal: 24, 
           paddingBottom: 40,
           paddingTop: 32 
         }}
         
-        // Espaçamento entre as colunas e linhas
         columnWrapperStyle={numColumns > 1 ? { gap: 12, marginBottom: 12 } : null}
         
         ListHeaderComponent={
           <View className="mb-8">
-            {/* HERO BILLBOARD SECTION */}
             <View 
               className="relative rounded-3xl bg-white/[0.02] border border-white/10 p-8 overflow-hidden"
               style={{ minHeight: 200, justifyContent: 'flex-end' }}
@@ -140,10 +136,7 @@ export function PokedexView({
               </View>
             </View>
 
-            {/* SEARCH & FILTERS AREA */}
             <View className="mt-8 bg-white/[0.01] border border-white/10 rounded-2xl p-5 gap-6">
-              
-              {/* Search Input */}
               <View className="relative">
                 <View className="absolute left-4 z-10" style={{ top: '50%', transform: [{translateY: -7}] }}>
                   <Search size={14} color="#52525b" />
@@ -166,7 +159,6 @@ export function PokedexView({
                 )}
               </View>
 
-              {/* Sort Selection */}
               <View>
                 <View className="flex-row items-center gap-2 mb-3 px-1">
                   <ArrowUpDown size={12} color="#FF421C" />
@@ -190,7 +182,6 @@ export function PokedexView({
                 </ScrollView>
               </View>
 
-              {/* Type Filters */}
               <View className="border-t border-white/10 pt-5">
                 <View className="flex-row items-center justify-between mb-4 px-1">
                   <View className="flex-row items-center gap-2">
@@ -226,7 +217,6 @@ export function PokedexView({
                 </ScrollView>
               </View>
 
-              {/* Status Bar */}
               <View className="flex-row items-center justify-between pt-2">
                 <Text className="text-[9px] font-mono text-zinc-500 uppercase">
                   Resultados: <Text className="text-white font-bold">{sortedPokemon.length}</Text>
@@ -243,7 +233,6 @@ export function PokedexView({
         }
 
         renderItem={({ item: pokemon }) => (
-          // Usamos flex: 1 para que o FlatList gerencie a largura uniformemente
           <View style={{ flex: 1 }}>
             <PokemonCard
               pokemon={pokemon}

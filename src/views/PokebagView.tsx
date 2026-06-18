@@ -92,7 +92,6 @@ export function PokebagView({
         <View className="flex-row items-center justify-between border-b border-white/10 pb-4 mb-6">
           <View className="flex-row items-center gap-2">
             <Zap size={16} color="#10b981" />
-            {/* AGORA REFLETE O LIMITE REAL DA API (5 POKÉMONS) */}
             <Text className="text-sm font-black uppercase text-white tracking-[2px]">
               TIME ATIVO <Text className="text-emerald-500">({battleTeam.length}/5)</Text>
             </Text>

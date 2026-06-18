@@ -61,13 +61,11 @@ export function TrainerAuthScreen({
       try {
         responseData = await response.json();
       } catch (e) {
-        // resposta vazia ou não-JSON
       }
 
       if (response.ok) {
         const userId = responseData.userId;
 
-        // localStorage não existe no React Native — usamos AsyncStorage (assíncrono)
         await AsyncStorage.setItem("userId", userId);
 
         const profileResponse = await fetch(
@@ -86,7 +84,7 @@ export function TrainerAuthScreen({
           derrotas: profileData.derrotas,
           avatar:
             profileData.username === "Goti22"
-              ? "goti22" // chave resolvida pelo mapa de assets locais em ProfileView (resolveAvatarSource)
+              ? "goti22"
               : `https://api.dicebear.com/7.x/avataaars/svg?seed=${profileData.username}`,
         });
       } else {
@@ -129,7 +127,6 @@ export function TrainerAuthScreen({
       try {
         responseData = await response.json();
       } catch (e) {
-        // resposta vazia ou não-JSON
       }
 
       if (response.ok) {
@@ -168,7 +165,6 @@ export function TrainerAuthScreen({
           className="w-full bg-white/[0.01] border border-white/10 p-8 rounded-2xl relative overflow-hidden"
           style={{ maxWidth: 420, alignSelf: "center" }}
         >
-          {/* Barra de brilho superior */}
           <LinearGradient
             colors={["#FF421C", "#fbbf24", "#FF421C"]}
             start={{ x: 0, y: 0 }}
@@ -194,7 +190,6 @@ export function TrainerAuthScreen({
           </View>
 
           {isRegistering ? (
-            /* TELA DE CADASTRO */
             <View className="gap-4">
               <View>
                 <Text className="text-[9px] text-zinc-400 font-mono mb-1.5 uppercase tracking-wider">
@@ -294,7 +289,6 @@ export function TrainerAuthScreen({
               </View>
             </View>
           ) : (
-            /* TELA DE LOGIN */
             <View className="gap-4">
               <View>
                 <Text className="text-[9px] text-zinc-400 font-mono mb-1.5 uppercase tracking-wider">

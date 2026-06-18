@@ -73,23 +73,21 @@ export function usePokemonLogic() {
     }
   }, []);
 
-  // --- ESTRATÉGIA DEFINITIVA DE SWAP ---
   const updateTeamOnServer = async (removedId: number, newId: number) => {
     const userId = await AsyncStorage.getItem("userId");
     if (!userId) return;
 
-    // Colocamos os parâmetros na URL igual ao Postman
     const url = `${BASE_URL}/pokemon/v1/team?user-id=${userId}&removed-pokemon=${removedId}&new-pokemon=${newId}&removedPokemon=${removedId}&newPokemon=${newId}`;
 
     const response = await fetch(url, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" }, // OBRIGATÓRIO PARA A AWS NÃO BLOQUEAR
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         removedPokemon: removedId,
         newPokemon: newId,
         "removed-pokemon": removedId,
         "new-pokemon": newId,
-      }), // Mandamos no Body também com todos os padrões de nomenclatura possíveis
+      }),
     });
 
     const text = await response.text();
@@ -100,10 +98,9 @@ export function usePokemonLogic() {
     return text ? JSON.parse(text) : {};
   };
 
-  // --- ESTRATÉGIA DEFINITIVA DE REORDENAÇÃO ---
   const setTeamOrderOnServer = async (newTeamIds: number[]) => {
     const userId = await AsyncStorage.getItem("userId");
-    if (!userId || newTeamIds.length !== 5) return; // Garante que só envia se tiver 5
+    if (!userId || newTeamIds.length !== 5) return;
 
     const idsString = newTeamIds.join(",");
     const url = `${BASE_URL}/pokemon/v1/team?user-id=${userId}&teamOrder=${idsString}`;
@@ -150,7 +147,6 @@ export function usePokemonLogic() {
 
   const handleRemoveFromTeam = async (id: number) => {
     try {
-      // Pega o primeiro Pokémon que está na Bag, mas não está no Time
       const substitutoDisponivel = pokebag.find(
         (p) => !battleTeam.some((teamPoke) => teamPoke.id === p.id),
       );
@@ -179,14 +175,12 @@ export function usePokemonLogic() {
       return;
     }
 
-    // 1. Sorteamos os 5 IDs que vão entrar no time ANTES de começar as trocas
     let novosIds: number[] = [];
     if (pokebag.length >= 5) {
       // Sorteia 5 sem repetir
       const embaralhado = [...pokebag].sort(() => Math.random() - 0.5);
       novosIds = embaralhado.slice(0, 5).map((p) => p.id);
     } else {
-      // Menos de 5: sorteia 5 vezes podendo repetir
       for (let i = 0; i < 5; i++) {
         const rIdx = Math.floor(Math.random() * pokebag.length);
         novosIds.push(pokebag[rIdx].id);
@@ -194,21 +188,15 @@ export function usePokemonLogic() {
     }
 
     try {
-      // 2. Opcional: Mostrar um alerta de carregamento ou algo do tipo
-      // Pois faremos 5 requisições seguidas
-
-      // 3. Loop de trocas: Para cada pokemon do time atual, trocamos pelo sorteado
       for (let i = 0; i < battleTeam.length; i++) {
         const pokemonAntigoId = battleTeam[i].id;
         const pokemonNovoId = novosIds[i];
 
-        // Só faz a chamada se o pokemon for realmente diferente
         if (pokemonAntigoId !== pokemonNovoId) {
           await updateTeamOnServer(pokemonAntigoId, pokemonNovoId);
         }
       }
 
-      // 4. Após terminar todas as trocas, recarregamos o time do servidor uma única vez
       await loadTrainerTeam();
       Alert.alert("Sucesso", "O time foi totalmente renovado!");
     } catch (error) {
@@ -217,7 +205,7 @@ export function usePokemonLogic() {
         "Erro",
         "Houve um problema ao trocar alguns membros do time.",
       );
-      await loadTrainerTeam(); // Recarrega para ver onde parou
+      await loadTrainerTeam();
     }
   };
 
@@ -228,20 +216,17 @@ export function usePokemonLogic() {
     const targetIdx = direction === "up" ? index - 1 : index + 1;
     if (targetIdx < 0 || targetIdx >= battleTeam.length) return;
 
-    // Atualiza a interface rapidamente (Optimistic Update)
     const newTeam = [...battleTeam];
     const temp = newTeam[index];
     newTeam[index] = newTeam[targetIdx];
     newTeam[targetIdx] = temp;
     setBattleTeam(newTeam);
 
-    try {
-      // Manda a nova lista de 5 IDs para a API salvar
-      const newTeamIds = newTeam.map((p) => p.id);
+    try {      const newTeamIds = newTeam.map((p) => p.id);
       await setTeamOrderOnServer(newTeamIds);
     } catch (error) {
       console.log("Falha ao salvar a nova ordem no servidor");
-      await loadTrainerTeam(); // Desfaz a mudança visual se o servidor der erro
+      await loadTrainerTeam();
     }
   };
 
@@ -249,7 +234,6 @@ export function usePokemonLogic() {
     try {
       const userId = await AsyncStorage.getItem("userId");
 
-      // Se ele estiver no time, forçamos a troca antes de apagar
       if (battleTeam.some((p) => p.id === id)) {
         await handleRemoveFromTeam(id);
       }

@@ -38,7 +38,7 @@ export function PokemonCard({ pokemon, isShiny, onSelect }: PokemonCardProps) {
       style={{
         opacity: fadeAnim,
         transform: [{ translateY }],
-        overflow: 'hidden', // Corta qualquer brilho que tente sair do card
+        overflow: 'hidden',
       }}
       className="relative rounded-3xl border border-white/10 bg-[#121212] mb-1"
     >
@@ -47,10 +47,7 @@ export function PokemonCard({ pokemon, isShiny, onSelect }: PokemonCardProps) {
         className="p-5"
         style={({ pressed }) => ({ opacity: pressed ? 0.9 : 1 })}
       >
-        
-        {/* REMOVIDO: O "Glow de Canto" que estava ficando perdido */}
 
-        {/* Cabeçalho */}
         <View className="flex-row items-center justify-between z-20">
           <View className="flex-row items-center gap-2">
             <View className="h-[2px] w-3 bg-[#FF421C]" />
@@ -65,9 +62,7 @@ export function PokemonCard({ pokemon, isShiny, onSelect }: PokemonCardProps) {
           )}
         </View>
 
-        {/* CONTAINER DA IMAGEM: O círculo agora é filho direto do container centralizado */}
         <View className="my-4 items-center justify-center h-32 relative">
-          {/* CÍRCULO CORRETO: Único fundo, centralizado nativamente pelo Flexbox */}
           <View
             pointerEvents="none"
             style={{ 
@@ -76,7 +71,7 @@ export function PokemonCard({ pokemon, isShiny, onSelect }: PokemonCardProps) {
               height: 90,
               borderRadius: 45,
               opacity: 0.15,
-              position: 'absolute', // Fica atrás da imagem
+              position: 'absolute',
             }}
           />
 
@@ -87,12 +82,10 @@ export function PokemonCard({ pokemon, isShiny, onSelect }: PokemonCardProps) {
           />
         </View>
 
-        {/* Nome */}
         <Text className="text-lg font-black uppercase text-white italic tracking-tighter">
           {pokemon.nome}
         </Text>
 
-        {/* Tipos */}
         <View className="mt-2 flex-row flex-wrap gap-1">
           {pokemon.tipos.map((tipo) => (
             <View
@@ -110,7 +103,6 @@ export function PokemonCard({ pokemon, isShiny, onSelect }: PokemonCardProps) {
           ))}
         </View>
 
-        {/* Stats */}
         <View className="mt-4 pt-3 border-t border-white/5 gap-2">
           <View>
             <View className="flex-row justify-between items-center mb-1">

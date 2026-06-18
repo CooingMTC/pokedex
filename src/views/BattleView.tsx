@@ -10,7 +10,6 @@ import { useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { CORES_HEX, Pokemon } from "../types";
 
-// Função para pegar o sprite de costas (para o Pokémon do jogador)
 const getAnimatedBackSprite = (id: number, isShiny: boolean): string => {
     if (id > 0 && id <= 649) {
         if (isShiny) {
@@ -46,7 +45,6 @@ export function BattleView({ battleTeam, pokemonList, isShinyMaster, onCatch }: 
     const [playerIndex, setPlayerIndex] = useState(0);
     const [opponentIndex, setOpponentIndex] = useState(0);
 
-    // HP simulado (max 100 para todos para simplificar)
     const [playerHp, setPlayerHp] = useState(100);
     const [opponentHp, setOpponentHp] = useState(100);
     const [log, setLog] = useState<string[]>([]);
